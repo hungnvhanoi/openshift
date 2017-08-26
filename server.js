@@ -4,11 +4,11 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan'),
-//newcode
     bodyParser = require('body-parser');
 
 Object.assign=require('object-assign')
 
+app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
 
