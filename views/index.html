@@ -116,7 +116,7 @@ function mapCanvasLoaded(){
 function addPlace()
   {
        var xhr = new XMLHttpRequest();
-        xhr.open("POST", '/addPlace', false);
+        xhr.open("POST", '/addPlace', true);
 
   //Send the proper header information along with the request
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
