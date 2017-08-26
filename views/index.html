@@ -28,11 +28,16 @@
 <div id="map"></div>
 <script>
 
+var options = {
+zoom:14,
+center:{lat:21.011981,lng:105.830821}
+}
+
 var firstMethod = function() {
    var promise = new Promise(function(resolve, reject){
      var data;
      var xhr = new XMLHttpRequest();
-     xhr.open("POST", 'http://localhost:8000/loadPlaces', true);
+     xhr.open("POST", '/loadPlaces', true);
      //Send the proper header information along with the request
      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
      xhr.onreadystatechange = function() {
@@ -95,13 +100,6 @@ var secondMethod = function(someStuff) {
          });
        }
      }
-
-
-
-      // setTimeout(function() {
-      //    console.log('second method completed');
-      //    resolve({newData: someStuff.data + ' some more data'});
-      // }, 2000);
    });
    return promise;
 };
@@ -113,77 +111,12 @@ function mapCanvasLoaded(){
 
 
 
-var options = {
-zoom:14,
-center:{lat:21.011981,lng:105.830821}
-}
-var markers;
-function initMap(){
-  // Map options
-
-    markers = loadPlaces(options);
-    // New map
-    var map = new google.maps.Map(document.getElementById('map'), options);
-
-    // Listen for click on map
-    google.maps.event.addListener(map, 'click', function(event){
-      // Add marker
-      addMarker({coords:event.latLng});
-      var latOutput = document.getElementById("latOutput");
-      var lngOutput = document.getElementById("lngOutput");
-      latOutput.innerHTML = event.latLng.lat();
-      lngOutput.innerHTML = event.latLng.lng();
-    });
-
-    // Loop through markers
-    for(var i = 0;i < markers.length;i++){
-      // Add marker
-      addMarker(markers[i]);
-    }
-    // Add Marker Function
-    function addMarker(props){
-      var marker = new google.maps.Marker({
-        position:props.coords,
-        map:map,
-        //icon:props.iconImage
-      });
-      // Check for customicon
-      if(props.iconImage){
-        // Set icon image
-        marker.setIcon(props.iconImage);
-      }
-      // Check content
-      if(props.content){
-        var infoWindow = new google.maps.InfoWindow({
-          description:props.content
-        });
-        marker.addListener('click', function(){
-          infoWindow.open(map, marker);
-        });
-      }
-    }
-  }
-
-function loadPlaces(options){
-  var data;
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", 'http://localhost:8000/loadPlaces', true);
-  //Send the proper header information along with the request
-  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhr.onreadystatechange = function() {
-  if (xhr.readyState == XMLHttpRequest.DONE) {
-    //document.getElementById('response').innerHTML = xhr.response;
-    data = xhr.response;
-  }};
-  xhr.send(data);
-  return data;
-  }
 
 
 function addPlace()
   {
        var xhr = new XMLHttpRequest();
-        xhr.open("POST", 'http://localhost:8000/addPlace', false);
+        xhr.open("POST", '/addPlace', false);
 
   //Send the proper header information along with the request
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
