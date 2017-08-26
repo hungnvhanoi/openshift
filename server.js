@@ -8,9 +8,32 @@ var express = require('express'),
 
 Object.assign=require('object-assign')
 
+app.use('/img', express.static('img'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('html', require('ejs').renderFile);
 app.use(morgan('combined'))
+
+app.post('/loadPlaces', (req, res) => {
+  var lat = req.body.lat;
+  var lng = req.body.lng;
+  db.collection('locations').find({},{_id:0},['lat','lng']).toArray(function(err, results){
+    console.log(results); // output all records
+    res.send(results);
+});
+});
+
+app.post('/addPlace', (req, res) => {
+  //const note = { lat: req.body.lat,lng: req.body.lng ,description: req.body.name,type: req.body.type };
+  const note = { coords:{lat: Number(req.body.lat),lng: Number(req.body.lng)} ,description: req.body.name,iconImage: req.body.type };
+  db.collection('locations').insert(note, (err, result) => {
+    if (err) {
+      res.send({ 'error': 'An error has occurred' });
+    } else {
+      res.send(result.ops[0]);
+      console.log(req.body);
+    }
+  });
+});
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
