@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Clinic demo</title>
+
+  <style>
+    #map{
+      height:350px;
+      width:100%;
+    }
+    #topbanner{
+      background-color: #F76458;
+      font-weight:bold;
+      height: 40px;
+      display: flex;
+      align-items:center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="topbanner">
+    <span style="color:white;font-family:Palatino Linotype;">PhongKhamTot</span>
+  </div>
+  <div id="map"></div>
+  <script>
+
+    function initMap(){
+      // Map options
+        var options = {
+        zoom:14,
+        center:{lat:21.011981,lng:105.830821}
+      }
+
+
+
+      // New map
+      var map = new google.maps.Map(document.getElementById('map'), options);
+
+      // Listen for click on map
+      google.maps.event.addListener(map, 'click', function(event){
+        // Add marker
+        addMarker({coords:event.latLng});
+        var latOutput = document.getElementById("latOutput");
+        var lngOutput = document.getElementById("lngOutput");
+        latOutput.innerHTML = event.latLng.lat();
+        lngOutput.innerHTML = event.latLng.lng();
+
+      });
+
+      var markers = [
+        {
+          coords:{lat:21.008625,lng:105.834336},
+          iconImage:'img/pharmacy.png',
+          content:'<h1>Quan game</h1>'
+        },
+        {
+          coords:{lat:21.012859,lng:105.830896},
+          content:'<h1>Ho Xa Dan</h1>'
+        },
+        {
+          coords:{lat:21.003518,lng:105.827713},
+          iconImage:'img/clinic.png'
+        }
+      ];
+
+      // Loop through markers
+      for(var i = 0;i < markers.length;i++){
+        // Add marker
+        addMarker(markers[i]);
+      }
+
+      // Add Marker Function
+      function addMarker(props){
+        var marker = new google.maps.Marker({
+          position:props.coords,
+          map:map,
+          //icon:props.iconImage
+        });
+
+        // Check for customicon
+        if(props.iconImage){
+          // Set icon image
+          marker.setIcon(props.iconImage);
+        }
+
+        // Check content
+        if(props.content){
+          var infoWindow = new google.maps.InfoWindow({
+            content:props.content
+          });
+
+          marker.addListener('click', function(){
+            infoWindow.open(map, marker);
+          });
+        }
+      }
+    }
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAhhuxSMKaj6e3s177F5p4ahJIaHTpiPE&callback=initMap">
+    </script>
+    <br>
+<div id="infoBox" style="padding: 5px;">
+  Kinh do: <label id="latOutput" style="color:#F76458"></label><br>
+  Vi do: <label id="lngOutput" style="color:#F76458"></label><br>
+  Ten dia diem <input type="text" id="nameOutput"><br>
+  The loai
+  <select id="typeOutput">
+    <option value="clinic">Phong kham</option>
+    <option value="pharmacy">Hieu thuoc</option>
+  </select>
+
+</div>
+
+</body>
+</html>
