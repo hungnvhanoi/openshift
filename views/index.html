@@ -11,7 +11,7 @@
       width:100%;
     }
     #topbanner{
-      background-color: #F76458;
+      background-color: #39A8C3;
       font-weight:bold;
       height: 40px;
       display: flex;
@@ -20,7 +20,7 @@
     }
   </style>
 </head>
-<body>
+<body style="background-color:#0A4D6A">
 
 <div id="topbanner">
   <span style="color:white;font-family:Palatino Linotype;">PhongKhamTot</span>
@@ -130,20 +130,23 @@ function addPlace()
   var mota = document.getElementById('descOutput').value;
   var theloai = document.getElementById('typeOutput').value;
   xhr.send("lat="+kinhdo+"&"+"lng="+vido+"&"+"name="+mota+"&"+"type="+theloai);
+  Document.getElementById('submitBtn').style.visibility = 'hidden';    
   }
 
 </script>
 <script async defer
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAhhuxSMKaj6e3s177F5p4ahJIaHTpiPE&callback=mapCanvasLoaded">
-  //src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAhhuxSMKaj6e3s177F5p4ahJIaHTpiPE&callback=initMap">
   </script>
   <br>
 <div id="infoBox" style="padding: 5px;">
-Kinh do: <label id="latOutput" style="color:#F76458"></label><br>
-Vi do: <label id="lngOutput" style="color:#F76458"></label><br>
-Mo ta <input type="text" id="descOutput"><br>
-The loai
-<select id="typeOutput">
+    <span style="color:#F4AA61;font-family:Palatino Linotype;">Kinh do:</span> 
+    <label id="latOutput" style="color:#F76458"></label><br>
+    <span style="color:#F4AA61;font-family:Palatino Linotype;">Vi do:</span> 
+    <label id="lngOutput" style="color:#F76458"></label><br>
+    <span style="color:#F4AA61;font-family:Palatino Linotype;">Mo ta</span>
+    <input type="text" id="descOutput" style="background-color:#0A4D6A;color:white"><br>
+    <span style="color:#F4AA61;font-family:Palatino Linotype;">The loai</span>
+<select id="typeOutput" style="color:white;font-family:Palatino Linotype;background-color:#0A4D6A">
   <option value="img/clinic.png">Phong kham</option>
   <option value="img/pharmacy.png">Hieu thuoc</option>
 </select>
@@ -152,7 +155,7 @@ The loai
 <script>
 
 </script>
-<button onclick="addPlace()">Nhap dia diem</button>
+<button id="submitBtn" onclick="addPlace()">Nhap dia diem</button>
 <label id="response" style="color:#F76458"></label>
 <br>
 </body>
