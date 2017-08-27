@@ -9,7 +9,7 @@
     #map{
       height:350px;
       width:100%;
-      top:0;left:0;right:0;position:absolute;  
+      top:0;left:0;right:0;  
     }
     #topbanner{
       background-color: #39A8C3;
@@ -124,6 +124,7 @@ function addPlace()
   xhr.onreadystatechange = function() {//Call a function when the state changes.
       if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
           // Request finished. Do processing here.
+          window.location.reload(); 
     }
   }
   var kinhdo = document.getElementById('latOutput').innerHTML;
@@ -131,7 +132,8 @@ function addPlace()
   var mota = document.getElementById('descOutput').value;
   var theloai = document.getElementById('typeOutput').value;
   xhr.send("lat="+kinhdo+"&"+"lng="+vido+"&"+"name="+mota+"&"+"type="+theloai);
-  Document.getElementById('submitBtn').style.visibility = 'hidden';    
+  //Document.getElementById('submitBtn').style.visibility = 'hidden';  
+     
   }
 
 </script>
