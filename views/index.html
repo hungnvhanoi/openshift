@@ -9,6 +9,7 @@
     #map{
       height:350px;
       width:100%;
+      top:0;left:0;right:0;position:absolute;  
     }
     #topbanner{
       background-color: #39A8C3;
@@ -22,8 +23,8 @@
 </head>
 <body style="background-color:#0A4D6A">
 
-<div id="topbanner">
-  <span style="color:white;font-family:Palatino Linotype;">PhongKhamTot</span>
+<div id="topbanner" style="top:0;left:0;right:0;position:absolute;">
+  <span style="color:white;font-family:Book Antiqua;">PhongKhamTot</span>
 </div>
 <div id="map"></div>
 <script>
@@ -139,14 +140,14 @@ function addPlace()
   </script>
   <br>
 <div id="infoBox" style="padding: 5px;">
-    <span style="color:#F4AA61;font-family:Palatino Linotype;">Kinh do:</span> 
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Kinh do:</span> 
     <label id="latOutput" style="color:#F76458"></label><br>
-    <span style="color:#F4AA61;font-family:Palatino Linotype;">Vi do:</span> 
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Vi do:</span> 
     <label id="lngOutput" style="color:#F76458"></label><br>
-    <span style="color:#F4AA61;font-family:Palatino Linotype;">Mo ta</span>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Mo ta</span>
     <input type="text" id="descOutput" style="background-color:#0A4D6A;color:white"><br>
-    <span style="color:#F4AA61;font-family:Palatino Linotype;">The loai</span>
-<select id="typeOutput" style="color:white;font-family:Palatino Linotype;background-color:#0A4D6A">
+    <span style="color:#F4AA61;font-family:Book Antiqua;">The loai</span>
+<select id="typeOutput" style="color:white;font-family:Book Antiqua;background-color:#0A4D6A">
   <option value="img/clinic.png">Phong kham</option>
   <option value="img/pharmacy.png">Hieu thuoc</option>
 </select>
