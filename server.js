@@ -11,7 +11,7 @@ Object.assign=require('object-assign')
 app.use('/img', express.static('img'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'))
+app.use(morgan('combined'));
 app.get('/favicon.ico',function(req,res){
   res.sendFile(__dirname + '/favicon.ico')
 });
