@@ -45,18 +45,18 @@ var firstMethod = function() {
      var data;
      var xhr = new XMLHttpRequest();
      xhr.open("POST", '/loadPlaces', true);
-     //Send the proper header information along with the request
      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
      xhr.onreadystatechange = function() {
      if (xhr.readyState == XMLHttpRequest.DONE) {
        data = xhr.response;
        resolve(data);
+       console.log(data);
      }
-     //else{
-     //  data = [{"coords":{"lat":21.010964436190935,"lng":105.83456039428711},"description":"ddd","iconImage":"img/pharmacy.png"},
-     //          {"coords":{"lat":21.014169360284292,"lng":105.82589149475098},"description":"first","iconImage":"img/clinic.png"}];
-     //  resolve(data);
-     //}
+     else{
+      data = [{"coords":{"lat":21.010964436190935,"lng":105.83456039428711},"description":"Pharmacy","iconImage":"img/pharmacy.png"},
+              {"coords":{"lat":21.014169360284292,"lng":105.82589149475098},"description":"Clinic","iconImage":"img/clinic.png"}];
+      resolve(data);
+     }
      };
      xhr.send(data);
    });
@@ -119,8 +119,6 @@ function mapCanvasLoaded(){
 function addPlace(){
   var xhr = new XMLHttpRequest();
   xhr.open("POST", '/addPlace', true);
-
-  //Send the proper header information along with the request
   xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
   xhr.onreadystatechange = function() {//Call a function when the state changes.
     if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
