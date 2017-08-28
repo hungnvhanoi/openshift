@@ -66,7 +66,7 @@ var firstMethod = function() {
 var secondMethod = function(someStuff) {
    var promise = new Promise(function(resolve, reject){
      //var markers = someStuff;
-     var markers = someStuff;
+     var markers = JSON.parse(someStuff);
      // New map
      var map = new google.maps.Map(document.getElementById('map'), options);
 
