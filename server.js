@@ -17,11 +17,11 @@ app.get('/favicon.ico',function(req,res){
 });
 
 app.get('/location.html', function (req, res) {
-  res.sendFile(__dirname + '/location');
+  res.sendFile(__dirname + '/location.html');
 });
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/search');
+app.get('/search.html', function (req, res) {
+  res.sendFile(__dirname + '/search.html');
 });
 
 app.post('/loadSuggestions', (req, res) => {
@@ -107,23 +107,23 @@ var initDb = function(callback) {
 
 
 
-//app.get('/', function (req, res) {
-//  // try to initialize the db on every request if it's not already
-//  // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
-//  if (db) {
-//    var col = db.collection('counts');
-//    // Create a document with request IP and current time of request
-//    col.insert({ip: req.ip, date: Date.now()});
-//    col.count(function(err, count){
-//      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-//    });
-//  } else {
-//    res.render('index.html', { pageCountMessage : null});
-//  }
-//});
+app.get('/', function (req, res) {
+ // try to initialize the db on every request if it's not already
+ // initialized.
+if (!db) {
+  initDb(function(err){});
+}
+ if (db) {
+   var col = db.collection('counts');
+   // Create a document with request IP and current time of request
+   col.insert({ip: req.ip, date: Date.now()});
+   col.count(function(err, count){
+     res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+   });
+ } else {
+   res.render('index.html', { pageCountMessage : null});
+ }
+});
 
 //app.get('/pagecount', function (req, res) {
 //  // try to initialize the db on every request if it's not already
