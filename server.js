@@ -16,6 +16,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/favicon.ico',function(req,res){
   res.sendFile(__dirname + '/favicon.ico')
 });
+app.get('/search', function (req, res) {
+  res.sendFile(__dirname + '/search.html');
+});
 
 app.post('/loadSuggestions', (req, res) => {
   var searchTxt = req.body.description;
