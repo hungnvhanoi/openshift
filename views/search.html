@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Clinic demo</title>
+  <style>
+#topbanner{
+  background-color: #39A8C3;
+  font-weight:bold;
+  height: 40px;
+  display: flex;
+  top:0;left:0;right:0;
+}
+#autocomplete {
+  background: #fff;
+  position: relative;
+  width: 250px;
+  box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.32);
+  margin: auto;
+  padding:0;
+}
+#inputs {
+  padding-left:10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-weight: 300;
+  width: 240px;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: #666;
+}
+#suggestions{
+  width: inherit;
+  background-color: grey;
+  height: 25px;
+  display:none;
+  position: absolute;
+}
+#button{
+  margin:auto;
+  height:25px;
+  width: 100px;
+}
+</style>
+</head>
+<body style="background-color:#0A4D6A;margin:0;padding:0">
+
+<div id="topbanner">
+  <span style="color:white;font-family:Book Antiqua;margin:auto;">PhongKhamTot</span>
+</div>
+<br><br><br><br><br>
+
+<div id="autocomplete" align="center">
+  <input id="inputs" type="text" placeholder="Bạn tìm phòng khám hay nhà thuốc?">
+  <div id="suggestions">
+  </div>
+</div>
+<br>
+<div style="margin:auto;width:200px;" align="center"><button onclick="search()">Search</button></div>
+
+<script>
+
+var suggestions = document.getElementById('suggestions');
+var inputs = document.getElementById('inputs');
+inputs.addEventListener('input',suggest);
+
+var timer;
+function suggest(){
+  window.clearTimeout(timer);
+  if(inputs.value != ""){
+    timer = window.setTimeout(function(){
+      suggestions.style.display = 'block';
+      var data;
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", '/loadSuggestions', true);
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhr.send("description="+inputs.value);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+          data = JSON.parse(xhr.response);
+          suggestions.innerHTML = "";
+          for(var i = 0;i < data.length;i++){
+            suggestions.innerHTML = data[i].description;
+          }
+        }
+      }
+    },500);
+  }
+      else{
+        suggestions.style.display = 'none';
+        suggestions.innerHTML = "";
+      }
+};
+
+function search(){
+  window.location.href='/index.html';
+}
+
+</script>
+<br>
+<br>
+</body>
+</html>
