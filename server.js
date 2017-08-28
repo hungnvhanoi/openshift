@@ -1,27 +1,19 @@
 //  OpenShift sample Node application
-const express = require('express');
-const fs      = require('fs');
-const app     = express();
-const eps     = require('ejs');
-const morgan  = require('morgan');
-const bodyParser = require('body-parser');
+var express = require('express'),
+    fs      = require('fs'),
+    app     = express(),
+    eps     = require('ejs'),
+    morgan  = require('morgan');
 
 Object.assign=require('object-assign')
 
+app.engine('html', require('ejs').renderFile);
+app.use(morgan('combined'))
+
 app.use('/img', express.static('img'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.engine('html', require('ejs').renderFile);
-app.use(morgan('combined'));
 app.get('/favicon.ico',function(req,res){
   res.sendFile(__dirname + '/favicon.ico')
-});
-
-app.get('/location.html', function (req, res) {
-  res.sendFile(__dirname + '/location.html');
-});
-
-app.get('/search.html', function (req, res) {
-  res.sendFile(__dirname + '/search.html');
 });
 
 app.post('/loadSuggestions', (req, res) => {
@@ -29,16 +21,16 @@ app.post('/loadSuggestions', (req, res) => {
   db.collection('locations').find({'description':searchTxt},{_id:0,'description':1}).toArray(function(err, results){
     console.log(results); // output all records
     res.send(results);
-});
+  });
 });
 
 app.post('/loadPlaces', (req, res) => {
   var lat = req.body.lat;
   var lng = req.body.lng;
-  db.collection('locations').find({},{_id:0},['lat','lng']).toArray(function(err, results){
+  db.collection('locations').find({},{_id:0}).toArray(function(err, results){
     console.log(results); // output all records
     res.send(results);
-});
+  });
 });
 
 app.post('/addPlace', (req, res) => {
@@ -61,14 +53,14 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
-//mongodb://clinicApp:123qwe@ds023463.mlab.com:23463/clinicdb
+
 if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
   var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
-      mongoHost = process.env[mongoServiceName + 'ds023463.mlab.com:23463/clinicdb'],
-      mongoPort = process.env[mongoServiceName + 23463],
-      mongoDatabase = process.env[mongoServiceName + 'clinicdb'],
-      mongoPassword = process.env[mongoServiceName + '123qwe']
-      mongoUser = process.env[mongoServiceName + 'clinicApp'];
+      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
+      mongoUser = process.env[mongoServiceName + '_USER'];
 
   if (mongoHost && mongoPort && mongoDatabase) {
     mongoURLLabel = mongoURL = 'mongodb://';
@@ -105,39 +97,37 @@ var initDb = function(callback) {
   });
 };
 
-
-
 app.get('/', function (req, res) {
- // try to initialize the db on every request if it's not already
- // initialized.
-if (!db) {
-  initDb(function(err){});
-}
- if (db) {
-   var col = db.collection('counts');
-   // Create a document with request IP and current time of request
-   col.insert({ip: req.ip, date: Date.now()});
-   col.count(function(err, count){
-     res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
-   });
- } else {
-   res.render('index.html', { pageCountMessage : null});
- }
+  // try to initialize the db on every request if it's not already
+  // initialized.
+  if (!db) {
+    initDb(function(err){});
+  }
+  if (db) {
+    var col = db.collection('counts');
+    // Create a document with request IP and current time of request
+    col.insert({ip: req.ip, date: Date.now()});
+    col.count(function(err, count){
+      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+    });
+  } else {
+    res.render('index.html', { pageCountMessage : null});
+  }
 });
 
 app.get('/pagecount', function (req, res) {
- // try to initialize the db on every request if it's not already
- // initialized.
- if (!db) {
-   initDb(function(err){});
- }
- if (db) {
-   db.collection('counts').count(function(err, count ){
-     res.send('{ pageCount: ' + count + '}');
-   });
- } else {
-   res.send('{ pageCount: -1 }');
- }
+  // try to initialize the db on every request if it's not already
+  // initialized.
+  if (!db) {
+    initDb(function(err){});
+  }
+  if (db) {
+    db.collection('counts').count(function(err, count ){
+      res.send('{ pageCount: ' + count + '}');
+    });
+  } else {
+    res.send('{ pageCount: -1 }');
+  }
 });
 
 // error handling
