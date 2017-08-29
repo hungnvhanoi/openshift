@@ -16,6 +16,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/favicon.ico',function(req,res){
   res.sendFile(__dirname + '/favicon.ico')
 });
+app.get('/search', function (req, res) {
+  res.sendFile(__dirname + '/search.html');
+});
 app.get('/create', function (req, res) {
   res.sendFile(__dirname + '/create.html');
 });
@@ -26,26 +29,121 @@ app.get('/result', function (req, res) {
   res.sendFile(__dirname + '/result.html');
 });
 
+function remSign(txt){
+  var original = txt.trim().toLowerCase();
+  var noA = original.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g,"a");
+  var noE = noA.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g,"e");
+  var noI = noE.replace(/ì|í|ị|ỉ|ĩ/g,"i");
+  var noO = noI.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g,"o");
+  var noU = noO.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g,"u");
+  var noY = noU.replace(/ỳ|ý|ỵ|ỷ|ỹ/g,"y");
+  var noD = noY.replace(/đ/g,"d")
+  return noD;
+}
+function remSpace(txt){
+  var original = txt.trim().toLowerCase();
+  var noSpace = original.replace(/\s/g,"-");
+  return noSpace;
+}
+
+function processSearch(fid,name,city,district,street,mayor,sickness,doctor,rating){
+  var processed = {
+      '_id':fid,
+      'keywords':[
+        name,
+        city,
+        district,
+        street,
+        mayor,
+        sickness,
+        doctor,
+        remSign(name),
+        remSign(city),
+        remSign(district),
+        remSign(street),
+        remSign(mayor),
+        remSign(sickness),
+        remSign(doctor)
+      ],
+      'rating':rating,
+      'searchRating':0,
+      'url': '/'+remSpace(remSign(name)) + '-'+fid
+    }
+  //onsole.log(processed);
+  return processed;
+}
+
+MongoClient.connect(url, (err, database) => {
+  if (err) return console.log(err)
+  //require('./app/routes')(app, database);
+    db = database;
+    app.listen(port, () => {
+    console.log('We are live on ' + port);
+  });
+})
+
 app.post('/loadSuggestions', (req, res) => {
   var searchTxt = req.body.description;
-  db.collection('locations').find({'description':searchTxt},{_id:0,'description':1}).toArray(function(err, results){
+  db.collection('searchIndex').find({'keywords':searchTxt},{_id:0,'keywords':1,'url':1}).toArray(function(err, results){
     console.log(results); // output all records
     res.send(results);
-  });
+});
 });
 
 app.post('/loadPlaces', (req, res) => {
   var lat = req.body.lat;
   var lng = req.body.lng;
   db.collection('locations').find({},{_id:0}).toArray(function(err, results){
-    console.log(results); // output all records
+    //console.log(results);
     res.send(results);
-  });
 });
+});
+
+var firstMethod = function(req,res,tata) {
+   var promise = new Promise(function(resolve, reject){
+     db.collection('locations').insert(tata, (err, result) => {
+       if (err) {
+         res.send({ 'error': 'An error has occurred' });
+       } else {
+         res.send(result.ops[0]);
+         keywords = processSearch(result.ops[0]._id,
+           req.body.name,
+           req.body.city,
+           req.body.district,
+           req.body.street,
+           req.body.mayor,
+           req.body.sickness,
+           req.body.doctor,
+           req.body.rating);
+           //console.log(keywords);
+           resolve(keywords);
+       }
+     });
+        //  console.log('first method completed');
+        //  resolve({data: '123'});
+   });
+   return promise;
+};
+
+var secondMethod = function(someStuff) {
+   var promise = new Promise(function(resolve, reject){
+     db.collection('searchIndex').insert(someStuff, (err, result) => {
+       if (err) {
+         //res.send({ 'error': 'An error has occurred' });
+         console.log('error');
+       } else {
+        //  res.send(result.ops[0]);
+         console.log('ok');
+       }
+     });
+   });
+   return promise;
+};
 
 app.post('/addPlace', (req, res) => {
   //const note = { lat: req.body.lat,lng: req.body.lng ,description: req.body.name,type: req.body.type };
-  const poi = { coords:{
+  var keywords;
+  var poi = { coords:{
     lat: Number(req.body.lat),
     lng: Number(req.body.lng)},
     name: req.body.name,
@@ -64,23 +162,48 @@ app.post('/addPlace', (req, res) => {
   if (!db) {
     initDb(function(err){});
   }
-  db.collection('locations').insert(poi, (err, result) => {
-    if (err) {
-      res.send({ 'error': 'An error has occurred' });
-    } else {
-      res.send(result.ops[0]);
-      console.log(req.body);
-    }
-  });
+  firstMethod(req,res,poi).then(secondMethod);
 });
 
+// app.post('/loadSuggestions', (req, res) => {
+//   var searchTxt = req.body.description;
+//   db.collection('locations').find({'description':searchTxt},{_id:0,'description':1}).toArray(function(err, results){
+//     console.log(results); // output all records
+//     res.send(results);
+//   });
+// });
+//
+// app.post('/loadPlaces', (req, res) => {
+//   var lat = req.body.lat;
+//   var lng = req.body.lng;
+//   db.collection('locations').find({},{_id:0}).toArray(function(err, results){
+//     console.log(results); // output all records
+//     res.send(results);
+//   });
+// });
+//
 // app.post('/addPlace', (req, res) => {
 //   //const note = { lat: req.body.lat,lng: req.body.lng ,description: req.body.name,type: req.body.type };
-//   const note = { coords:{lat: Number(req.body.lat),lng: Number(req.body.lng)} ,description: req.body.name,iconImage: req.body.type };
+//   const poi = { coords:{
+//     lat: Number(req.body.lat),
+//     lng: Number(req.body.lng)},
+//     name: req.body.name,
+//     iconImage: req.body.type,
+//     city: req.body.city,
+//     district: req.body.district,
+//     street: req.body.street,
+//     mayor: req.body.mayor,
+//     sickness: req.body.sickness,
+//     phone: req.body.phone,
+//     price: req.body.price,
+//     doctor: req.body.doctor,
+//     overtime: req.body.overtime,
+//     rating: req.body.rating
+//   };
 //   if (!db) {
 //     initDb(function(err){});
 //   }
-//   db.collection('locations').insert(note, (err, result) => {
+//   db.collection('locations').insert(poi, (err, result) => {
 //     if (err) {
 //       res.send({ 'error': 'An error has occurred' });
 //     } else {

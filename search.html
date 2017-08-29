@@ -56,10 +56,13 @@
 <br><br><br><br><br>
 
 <div id="autocomplete" align="center">
-  <input id="inputs" type="text" placeholder="Bạn tìm phòng khám hay nhà thuốc?">
+  <input id="inputs" type="text" placeholder="Bạn muốn tìm gì?">
+
   <div id="suggestions">
   </div>
 </div>
+<br>
+<div style="margin:auto" align="center"><span style="background-color:#0A4D6A;color:white">Vd: kham rang Dong Da..</span></div>
 <br>
 <div style="margin:auto;width:200px;" align="center"><button style="width:75px;height:25px" onclick="search()">Search</button></div>
 
@@ -86,7 +89,7 @@ function suggest(){
           suggestions.innerHTML = "";
           var tblSug="<table><tbody>";
           for(var i = 0;i < data.length;i++){
-             tblSug += "<tr><td>"+ data[i].description+"</td></tr>";
+             tblSug += "<tr><td><a href='/location"+data[i].url + "'>"+ data[i].keywords[0]+"</a></td></tr>";
           }
           tblSug += "</tbody></table>";
           suggestions.innerHTML = tblSug;
