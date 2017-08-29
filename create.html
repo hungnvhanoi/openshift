@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Clinic demo</title>
+  <style>
+    #map{
+      height:350px;
+      width:100%;
+    }
+    #topbanner{
+      background-color: #39A8C3;
+      font-weight:bold;
+      height: 40px;
+      display: flex;
+      align-items:center;
+      justify-content: center;
+      top:0;left:0;right:0;
+    }
+  </style>
+</head>
+<body style="background-color:#0A4D6A;margin:0;padding:0">
+
+<div id="topbanner">
+  <span style="color:white;font-family:Book Antiqua;">PhongKhamTot</span>
+</div>
+<div id="map"></div>
+<script>
+
+var options = {
+    zoom:14,
+    center:{lat:21.011981,lng:105.830821},
+    fullscreenControl:false,
+    maxZoom:19,
+    minZoom:12,
+    clickableIcons:false,
+    disableDefaultUI: true,
+    zoomControl:true
+}
+
+var firstMethod = function() {
+   var promise = new Promise(function(resolve, reject){
+     var data;
+     var xhr = new XMLHttpRequest();
+     xhr.open("POST", '/loadPlaces', true);
+     //Send the proper header information along with the request
+     xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+     xhr.onreadystatechange = function() {
+     if (xhr.readyState == XMLHttpRequest.DONE) {
+       data = xhr.response;
+       resolve(data);
+     }
+     //else{
+     //  data = [{"coords":{"lat":21.010964436190935,"lng":105.83456039428711},"description":"ddd","iconImage":"img/pharmacy.png"},
+     //          {"coords":{"lat":21.014169360284292,"lng":105.82589149475098},"description":"first","iconImage":"img/clinic.png"}];
+     //  resolve(data);
+     //}
+     };
+     xhr.send(data);
+   });
+   return promise;
+};
+
+var secondMethod = function(someStuff) {
+   var promise = new Promise(function(resolve, reject){
+     //var markers = someStuff;
+     var markers = JSON.parse(someStuff);
+     // New map
+     var map = new google.maps.Map(document.getElementById('map'), options);
+
+     // Listen for click on map
+     google.maps.event.addListener(map, 'click', function(event){
+       // Add marker
+       addMarker({coords:event.latLng});
+       var latOutput = document.getElementById("latOutput");
+       var lngOutput = document.getElementById("lngOutput");
+       latOutput.innerHTML = event.latLng.lat();
+       lngOutput.innerHTML = event.latLng.lng();
+       });
+       //var markers = [{"coords":{"lat":21.010964436190935,"lng":105.83456039428711},"description":"ddd","iconImage":"img/pharmacy.png"},         {"coords":{"lat":21.014169360284292,"lng":105.82589149475098},"description":"first","iconImage":"img/clinic.png"}];
+     // Loop through markers
+     for(var i = 0;i < markers.length;i++){
+       // Add marker
+       addMarker(markers[i]);
+     }
+     // Add Marker Function
+     function addMarker(props){
+       var marker = new google.maps.Marker({
+         position:props.coords,
+         map:map,
+         //icon:props.iconImage
+       });
+       // Check for customicon
+       if(props.iconImage){
+         // Set icon image
+         marker.setIcon(props.iconImage);
+       }
+       // Check content
+       if(props.name){
+         var infoWindow = new google.maps.InfoWindow({
+           content:props.name
+         });
+         marker.addListener('click', function(){
+           infoWindow.open(map, marker);
+         });
+       }
+     }
+   });
+     return promise;
+};
+
+function mapCanvasLoaded(){
+  firstMethod()
+   .then(secondMethod);
+  }
+
+function addPlace(){
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", '/addPlace', true);
+
+  //Send the proper header information along with the request
+  xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  xhr.onreadystatechange = function() {//Call a function when the state changes.
+    if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) {
+      // Request finished. Do processing here.
+      window.location.reload();
+      }
+    }
+  // var kinhdo = document.getElementById('latOutput').innerHTML;
+  // var vido = document.getElementById('lngOutput').innerHTML;
+  // var mota = document.getElementById('nameOutput').value;
+  // var loaihinh = document.getElementById('typeOutput').value;
+  // var
+
+  xhr.send("lat="+document.getElementById('latOutput').innerHTML
+  +"&"+"lng="+document.getElementById('lngOutput').innerHTML
+  +"&"+"name="+document.getElementById('nameOutput').value
+  +"&"+"type="+document.getElementById('typeOutput').value
+  +"&"+"city="+document.getElementById('cityOutput').value
+  +"&"+"district="+document.getElementById('distOutput').value
+  +"&"+"street="+document.getElementById('streOutput').value
+  +"&"+"mayor="+document.getElementById('mayorOutput').value
+  +"&"+"sickness="+document.getElementById('sickOutput').value
+  +"&"+"phone="+document.getElementById('phoneOutput').value
+  +"&"+"price="+document.getElementById('priceOutput').value
+  +"&"+"doctor="+document.getElementById('doctorOutput').value
+  +"&"+"overtime="+document.getElementById('overtOutput').checked
+  +"&"+"rating="+document.getElementById('rateOutput').value
+  );
+}
+
+</script>
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCAhhuxSMKaj6e3s177F5p4ahJIaHTpiPE&callback=mapCanvasLoaded">
+  </script>
+  <br>
+<table id="infoBox" style="padding: 5px 5px;"><tbody>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Kinh độ:</span></td>
+  <td>
+    <label id="latOutput" style="color:white"></label></td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Vĩ độ:</span></td>
+  <td>
+    <label id="lngOutput" style="color:white"></label></td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Tên địa điểm: </span></td>
+  <td>
+    <input type="text" style="width:250px;" placeholder="VD: Phòng khám Phương Đông" id="nameOutput" style="background-color:#0A4D6A;color:white;"></td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Loại hình</span></td>
+  <td>
+    <select id="typeOutput" style="color:black;font-family:Book Antiqua;background-color:white">
+      <option value="img/clinic.png">Phòng khám / Bệnh viện</option>
+      <option value="img/pharmacy.png">Hiệu thuốc / Nhà thuốc</option></select></td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Thành phố</span></td>
+  <td>
+    <select id="cityOutput" style="color:black;font-family:Book Antiqua;background-color:white">
+      <option value="Ha Noi">Hà Nội</option>
+      <option value="Ho Chi Minh">Hồ Chí Minh</option></select></td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Quận: </span>
+  </td><td>
+    <input type="text" style="width:150px;" placeholder="VD: Cầu Giấy" id="distOutput" style="background-color:#0A4D6A;color:white;">
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Các phố lân cận: </span>
+  </td><td>
+    <input type="text" style="width:150px;" placeholder="VD: Láng Hạ, le loi.." id="streOutput" style="background-color:#0A4D6A;color:white;">
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Chuyên khoa: </span>
+  </td><td>
+    <input type="text" style="width:250px;" placeholder="VD: da liễu,nhi,răng,phụ sản.." id="mayorOutput" style="background-color:#0A4D6A;color:white;"><span style="color:white"> * Nhà thuốc không cần điền</span>
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Bệnh / PP điều trị cụ thể: </span>
+  </td><td>
+    <input type="text" style="width:250px;" placeholder="VD: vẩy nến,tiền đình,siêu âm,diệt tủy.." id="sickOutput" style="background-color:#0A4D6A;color:white;"><span style="color:white"> * Nhà thuốc không cần điền</span>
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Số điện thoại: </span>
+  </td><td>
+    <input type="text" id="phoneOutput" style="width:250px;" placeholder="VD:.." style="background-color:#0A4D6A;color:white;"><span style="color:white"></span>
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Giá cả nói chung: </span>
+  </td><td>
+    <select id="priceOutput" style="color:black;font-family:Book Antiqua;background-color:white">
+      <option value="average">Bình thường</option>
+      <option value="cheap">Rẻ</option>
+      <option value="expensive">Đắt</option></select>
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Bác sĩ / Dược sĩ: </span>
+  </td><td>
+    <input type="text" id="doctorOutput" style="width:250px;" placeholder="VD: Bác sĩ A, bác sĩ B.." style="background-color:#0A4D6A;color:white;">
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Có làm ngoài giờ không? </span>
+  </td><td>
+    <input type="checkbox" id="overtOutput">
+  </td></tr>
+  <tr><td>
+    <span style="color:#F4AA61;font-family:Book Antiqua;">Mức độ đánh giá: </span>
+  </td><td>
+    <select id="rateOutput" style="color:black;font-family:Book Antiqua;background-color:white">
+      <option value="4">4 sao</option>
+      <option value="5">5 sao</option>
+      <option value="3">3 sao</option>
+      <option value="2">2 sao</option>
+      <option value="1">1 sao</option></select>
+  </td></tr>
+</tbody></table>
+</div>
+
+<br>
+<button id="submitBtn" onclick="addPlace()">Nhap dia diem</button>
+<label id="response" style="color:#F76458"></label>
+<br>
+</body>
+</html>

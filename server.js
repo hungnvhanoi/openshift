@@ -16,8 +16,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/favicon.ico',function(req,res){
   res.sendFile(__dirname + '/favicon.ico')
 });
-app.get('/search', function (req, res) {
-  res.sendFile(__dirname + '/search.html');
+app.get('/create', function (req, res) {
+  res.sendFile(__dirname + '/create.html');
+});
+app.get('/location', function (req, res) {
+  res.sendFile(__dirname + '/location.html');
+});
+app.get('/result', function (req, res) {
+  res.sendFile(__dirname + '/result.html');
 });
 
 app.post('/loadSuggestions', (req, res) => {
@@ -39,11 +45,26 @@ app.post('/loadPlaces', (req, res) => {
 
 app.post('/addPlace', (req, res) => {
   //const note = { lat: req.body.lat,lng: req.body.lng ,description: req.body.name,type: req.body.type };
-  const note = { coords:{lat: Number(req.body.lat),lng: Number(req.body.lng)} ,description: req.body.name,iconImage: req.body.type };
+  const poi = { coords:{
+    lat: Number(req.body.lat),
+    lng: Number(req.body.lng)},
+    name: req.body.name,
+    iconImage: req.body.type,
+    city: req.body.city,
+    district: req.body.district,
+    street: req.body.street,
+    mayor: req.body.mayor,
+    sickness: req.body.sickness,
+    phone: req.body.phone,
+    price: req.body.price,
+    doctor: req.body.doctor,
+    overtime: req.body.overtime,
+    rating: req.body.rating
+  };
   if (!db) {
     initDb(function(err){});
   }
-  db.collection('locations').insert(note, (err, result) => {
+  db.collection('locations').insert(poi, (err, result) => {
     if (err) {
       res.send({ 'error': 'An error has occurred' });
     } else {
@@ -52,6 +73,22 @@ app.post('/addPlace', (req, res) => {
     }
   });
 });
+
+// app.post('/addPlace', (req, res) => {
+//   //const note = { lat: req.body.lat,lng: req.body.lng ,description: req.body.name,type: req.body.type };
+//   const note = { coords:{lat: Number(req.body.lat),lng: Number(req.body.lng)} ,description: req.body.name,iconImage: req.body.type };
+//   if (!db) {
+//     initDb(function(err){});
+//   }
+//   db.collection('locations').insert(note, (err, result) => {
+//     if (err) {
+//       res.send({ 'error': 'An error has occurred' });
+//     } else {
+//       res.send(result.ops[0]);
+//       console.log(req.body);
+//     }
+//   });
+// });
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -104,15 +141,16 @@ var initDb = function(callback) {
 app.get('/', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
+  // if (!db) {
+  //   initDb(function(err){});
+  // }
   if (db) {
     var col = db.collection('counts');
     // Create a document with request IP and current time of request
-    col.insert({ip: req.ip, date: Date.now()});
+    //col.insert({ip: req.ip, date: Date.now()});
     col.count(function(err, count){
-      res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+      //res.render('index.html', { pageCountMessage : count, dbInfo: dbDetails });
+      res.render('index.html', { pageCountMessage : null});
     });
   } else {
     res.render('index.html', { pageCountMessage : null});
@@ -122,9 +160,9 @@ app.get('/', function (req, res) {
 app.get('/pagecount', function (req, res) {
   // try to initialize the db on every request if it's not already
   // initialized.
-  if (!db) {
-    initDb(function(err){});
-  }
+  // if (!db) {
+  //   initDb(function(err){});
+  // }
   if (db) {
     db.collection('counts').count(function(err, count ){
       res.send('{ pageCount: ' + count + '}');
