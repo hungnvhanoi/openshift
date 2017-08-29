@@ -73,15 +73,6 @@ function processSearch(fid,name,city,district,street,mayor,sickness,doctor,ratin
   return processed;
 }
 
-MongoClient.connect(url, (err, database) => {
-  if (err) return console.log(err)
-  //require('./app/routes')(app, database);
-    db = database;
-    app.listen(port, () => {
-    console.log('We are live on ' + port);
-  });
-})
-
 app.post('/loadSuggestions', (req, res) => {
   var searchTxt = req.body.description;
   db.collection('searchIndex').find({'keywords':searchTxt},{_id:0,'keywords':1,'url':1}).toArray(function(err, results){
